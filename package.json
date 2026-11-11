@@ -4,11 +4,15 @@
   "type": "module",
   "packageManager": "pnpm@11.9.0",
   "scripts": {
-    "dev": "node scripts/validate-content.mjs && nuxt dev",
-    "build": "node scripts/validate-content.mjs && nuxt build",
-    "generate": "node scripts/validate-content.mjs && nuxt generate",
+    "predev": "node scripts/validate-content.mjs && node scripts/build-index.mjs",
+    "dev": "nuxt dev",
+    "prebuild": "node scripts/validate-content.mjs && node scripts/build-index.mjs",
+    "build": "nuxt build",
+    "pregenerate": "node scripts/validate-content.mjs && node scripts/build-index.mjs",
+    "generate": "nuxt generate",
     "preview": "nuxt preview",
     "validate": "node scripts/validate-content.mjs",
+    "index": "node scripts/build-index.mjs",
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
