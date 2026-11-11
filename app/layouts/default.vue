@@ -32,13 +32,13 @@
   align-items: baseline;
   gap: 1.5rem;
   padding: 1.25rem 0;
-  border-bottom: 1px solid #e5e5e5;
+  border-bottom: 1px solid var(--line);
 }
 .brand {
   font-weight: 600;
   font-size: 1.125rem;
   text-decoration: none;
-  color: #111;
+  color: var(--ink);
 }
 .site-nav {
   display: flex;
@@ -46,10 +46,10 @@
   font-size: 0.9375rem;
 }
 .site-nav a {
-  color: #555;
+  color: var(--ink-2);
   text-decoration: none;
 }
-.site-nav a.router-link-active { color: #111; font-weight: 500; }
+.site-nav a.router-link-active { color: var(--ink); font-weight: 500; }
 .nav-search { margin-left: auto; }
 .site-main {
   padding: 2rem 0 4rem;
@@ -57,9 +57,9 @@
   width: 100%;
 }
 .site-footer {
-  border-top: 1px solid #eee;
+  border-top: 1px solid var(--line);
   padding: 1rem 0;
-  color: #999;
+  color: var(--ink-3);
   font-size: 0.75rem;
 }
 </style>

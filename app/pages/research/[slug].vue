@@ -33,7 +33,7 @@ useHead({ title: `${doc.title} · 研究档案 · 得心研究院` })
       </div>
     </header>
 
-    <div class="detail-body">
+    <div class="detail-body prose">
       <ContentRenderer :value="doc" />
     </div>
 
@@ -49,22 +49,22 @@ useHead({ title: `${doc.title} · 研究档案 · 得心研究院` })
 
 <style scoped>
 .detail { display: grid; grid-template-columns: minmax(0, 1fr) 18rem; gap: 2rem; }
-.detail-header { grid-column: 1 / -1; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid #eee; }
+.detail-header { grid-column: 1 / -1; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid var(--line); }
 .detail-meta { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; }
-.doc-id { font-family: ui-monospace, monospace; font-size: 0.8125rem; color: #888; }
+.doc-id { font-family: var(--font-mono); font-size: 0.8125rem; color: var(--ink-3); }
 .domain-tag {
   font-size: 0.6875rem;
-  background: #f1f5f9;
-  color: #475569;
+  background: var(--surface-2);
+  color: var(--ink-2);
   padding: 0.0625rem 0.375rem;
   border-radius: 3px;
 }
 h1 { font-size: 1.5rem; margin: 0.25rem 0 0.5rem; }
-.description { color: #666; margin: 0 0 0.75rem; }
+.description { color: var(--ink-2); margin: 0 0 0.75rem; }
 .tags { margin-top: 0.5rem; }
 .tag {
   font-size: 0.75rem;
-  color: #94a3b8;
+  color: var(--ink-3);
   margin-right: 0.5rem;
 }
 .detail-body { grid-column: 1; min-width: 0; }

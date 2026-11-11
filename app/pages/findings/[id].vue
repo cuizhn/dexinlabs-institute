@@ -36,7 +36,7 @@ useHead({ title: `${doc.title} · 研究结论 · 得心研究院` })
       </div>
     </header>
 
-    <div class="detail-body">
+    <div class="detail-body prose">
       <ContentRenderer :value="doc" />
     </div>
 
@@ -52,26 +52,25 @@ useHead({ title: `${doc.title} · 研究结论 · 得心研究院` })
 
 <style scoped>
 .detail { display: grid; grid-template-columns: minmax(0, 1fr) 18rem; gap: 2rem; }
-.detail-header { grid-column: 1 / -1; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid #eee; }
+.detail-header { grid-column: 1 / -1; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid var(--line); }
 .detail-meta { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; }
-.doc-id { font-family: ui-monospace, monospace; font-size: 0.8125rem; color: #888; }
+.doc-id { font-family: var(--font-mono); font-size: 0.8125rem; color: var(--ink-3); }
 h1 { font-size: 1.5rem; margin: 0.25rem 0 0.5rem; }
-.description { color: #666; margin: 0 0 0.75rem; }
+.description { color: var(--ink-2); margin: 0 0 0.75rem; }
 .scope {
   font-size: 0.8125rem;
-  color: #555;
-  background: #f8fafc;
-  border-left: 3px solid #cbd5e1;
+  color: var(--ink-2);
+  background: var(--surface-2);
+  border-left: 3px solid var(--line);
   padding: 0.375rem 0.625rem;
   margin-bottom: 0.75rem;
 }
 .scope-label {
   font-weight: 500;
-  color: #64748b;
   margin-right: 0.375rem;
 }
 .tags { margin-top: 0.5rem; }
-.tag { font-size: 0.75rem; color: #94a3b8; margin-right: 0.5rem; }
+.tag { font-size: 0.75rem; color: var(--ink-3); margin-right: 0.5rem; }
 .detail-body { grid-column: 1; min-width: 0; }
 @media (max-width: 60rem) { .detail { grid-template-columns: 1fr; } }
 </style>

@@ -70,16 +70,16 @@ const displayItems = () =>
   align-items: baseline;
   margin-bottom: 0.75rem;
   padding-bottom: 0.375rem;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--line);
 }
 .cl-header h3 {
   font-size: 1rem;
   margin: 0;
-  color: #333;
+  color: var(--ink);
 }
 .cl-more {
   font-size: 0.8125rem;
-  color: #1a56db;
+  color: var(--accent-2);
   text-decoration: none;
 }
 .cl-items {
@@ -92,25 +92,25 @@ const displayItems = () =>
   align-items: center;
   gap: 0.75rem;
   padding: 0.5rem 0;
-  border-bottom: 1px dashed #f0f0f0;
+  border-bottom: 1px dashed var(--line);
   text-decoration: none;
   color: inherit;
 }
-.cl-item:hover { background: #fafafa; }
+.cl-item:hover { background: var(--surface-2); }
 .cl-id {
-  font-family: ui-monospace, monospace;
+  font-family: var(--font-mono);
   font-size: 0.8125rem;
-  color: #888;
+  color: var(--ink-3);
   flex-shrink: 0;
   min-width: 4rem;
 }
 .cl-title {
   flex: 1;
   font-size: 0.9375rem;
-  color: #222;
+  color: var(--ink);
 }
 .cl-empty {
-  color: #999;
+  color: var(--ink-3);
   padding: 0.5rem 0;
 }
 </style>

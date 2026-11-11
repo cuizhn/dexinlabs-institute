@@ -19,5 +19,5 @@ useHead({ title: `${pageTitle} · 得心研究院` })
 
 <style scoped>
 h1 { font-size: 1.5rem; margin: 0 0 0.5rem; }
-.page-desc { color: #666; margin: 0 0 1.5rem; font-size: 0.9375rem; }
+.page-desc { color: var(--ink-2); margin: 0 0 1.5rem; font-size: 0.9375rem; }
 </style>

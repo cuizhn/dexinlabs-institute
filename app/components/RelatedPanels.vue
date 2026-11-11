@@ -172,8 +172,8 @@ const hasPendingValidationWarning = (items: any[]) =>
 
 <style scoped>
 .related-panels {
-  background: #fafafa;
-  border-left: 1px solid #e5e5e5;
+  background: var(--surface);
+  border-left: 1px solid var(--line);
   padding: 1rem 1.25rem;
   min-width: 16rem;
 }
@@ -181,7 +181,7 @@ const hasPendingValidationWarning = (items: any[]) =>
 .rp-section h4 {
   font-size: 0.875rem;
   font-weight: 600;
-  color: #555;
+  color: var(--ink-2);
   margin: 0 0 0.5rem;
   text-transform: none;
 }
@@ -195,24 +195,24 @@ const hasPendingValidationWarning = (items: any[]) =>
   align-items: center;
   gap: 0.5rem;
   padding: 0.375rem 0;
-  border-bottom: 1px dashed #eee;
+  border-bottom: 1px dashed var(--line);
   font-size: 0.875rem;
   flex-wrap: wrap;
 }
 .rp-id {
-  font-family: ui-monospace, monospace;
+  font-family: var(--font-mono);
   font-size: 0.75rem;
-  color: #888;
+  color: var(--ink-3);
   min-width: 4rem;
 }
 .rp-section a {
-  color: #1a56db;
+  color: var(--accent-2);
   text-decoration: none;
   flex: 1;
 }
 .rp-section a:hover { text-decoration: underline; }
 .rp-empty p {
-  color: #999;
+  color: var(--ink-3);
   font-size: 0.8125rem;
   margin: 0;
 }

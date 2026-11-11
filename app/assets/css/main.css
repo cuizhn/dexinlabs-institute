@@ -5,22 +5,157 @@
   --font-serif: 'Source Han Serif SC', 'Noto Serif SC', 'Songti SC', 'SimSun', serif;
   --font-sans: 'Source Han Sans SC', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
   --font-mono: ui-monospace, 'JetBrains Mono', Consolas, monospace;
+
+  /* 设计令牌（2026-11-11 页面美化第一档）
+     基调：暖白纸感 + 墨色文字 + 黛蓝主色。
+     彩色只留给 StatusBadge 的三套语义色（R11 + 第八批已裁，不同形不同色），
+     页面其余部分保持素色，不得引入第二套彩色体系。 */
+  --bg: #faf9f7;        /* 页面底色：暖白 */
+  --surface: #ffffff;   /* 卡片 / 面板 */
+  --surface-2: #f4f2ed; /* 代码块底、hover 底 */
+  --ink: #1f1e1c;       /* 主文字：墨色 */
+  --ink-2: #5c5952;     /* 次级文字 */
+  --ink-3: #948f85;     /* 弱化文字（ID、日期、面包屑） */
+  --line: #e8e4dc;      /* 分隔线：暖灰 */
+  --accent: #1e3a5f;    /* 主色：黛蓝（强调填充、当前态） */
+  --accent-2: #2c5282;  /* 链接色 */
 }
 
 html {
   font-family: var(--font-serif);
   line-height: 1.75;
-  color: #111;
-  background: #fff;
+  color: var(--ink);
+  background: var(--bg);
 }
 
 body {
   margin: 0;
 }
 
+::selection {
+  background: rgba(30, 58, 95, 0.14);
+}
+
+a {
+  color: var(--accent-2);
+}
+
 code,
 pre {
   font-family: var(--font-mono);
+}
+
+/* ============ 正文排版（.prose：详情页 ContentRenderer 输出） ============ */
+/* 学术阅读向：标题分层、表格细线、引用粗边、代码浅底、块级公式防溢出 */
+.prose {
+  font-size: 1rem;
+  line-height: 1.8;
+  overflow-wrap: break-word;
+}
+.prose > :first-child {
+  margin-top: 0;
+}
+.prose h2 {
+  font-size: 1.375rem;
+  line-height: 1.4;
+  font-weight: 600;
+  margin: 2.5rem 0 0.75rem;
+  padding-bottom: 0.375rem;
+  border-bottom: 1px solid var(--line);
+}
+.prose h3 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin: 2rem 0 0.5rem;
+}
+.prose h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 1.5rem 0 0.5rem;
+}
+.prose p {
+  margin: 0.875rem 0;
+}
+.prose a {
+  color: var(--accent-2);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(44, 82, 130, 0.35);
+}
+.prose a:hover {
+  border-bottom-color: var(--accent-2);
+}
+.prose ul,
+.prose ol {
+  margin: 0.875rem 0;
+  padding-left: 1.5rem;
+}
+.prose li {
+  margin: 0.25rem 0;
+}
+.prose li::marker {
+  color: var(--ink-3);
+}
+.prose blockquote {
+  margin: 1.25rem 0;
+  padding: 0.125rem 0 0.125rem 1rem;
+  border-left: 3px solid var(--line);
+  color: var(--ink-2);
+}
+.prose code:not(pre code) {
+  font-size: 0.875em;
+  background: var(--surface-2);
+  padding: 0.1em 0.35em;
+  border-radius: 4px;
+}
+.prose pre {
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 0.875rem 1rem;
+  overflow-x: auto;
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+.prose pre code {
+  background: none;
+  padding: 0;
+}
+/* display:block 使窄屏下长表格可横向滚动，不撑破版面 */
+.prose table {
+  display: block;
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.25rem 0;
+  font-size: 0.9375rem;
+  overflow-x: auto;
+}
+.prose th,
+.prose td {
+  border: 1px solid var(--line);
+  padding: 0.375rem 0.75rem;
+  text-align: left;
+}
+.prose th {
+  background: var(--surface-2);
+  font-weight: 600;
+}
+.prose hr {
+  border: 0;
+  border-top: 1px solid var(--line);
+  margin: 2rem 0;
+}
+.prose img {
+  max-width: 100%;
+  height: auto;
+}
+/* KaTeX 块级公式：窄屏长公式横向滚动而不是撑破版面（数学内容站硬伤修复） */
+.prose .katex-display {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0.5rem 0;
+}
+.prose .katex {
+  font-size: 1.05em;
 }
 
 /* 待字体文件到位后启用：
