@@ -1,0 +1,29 @@
+# 依赖
+node_modules/
+.pnpm-store/
+
+# Nuxt 生成物
+.nuxt/
+.output/
+.nitro/
+.data/
+
+# 包锁临时
+pnpm-debug.log*
+
+# 环境
+.env
+.env.local
+.env.*.local
+
+# 系统
+.DS_Store
+Thumbs.db
+
+# 编辑器
+.vscode/
+.idea/
+.screenshots/
+
+# 索引生成物（Q14，构建时派生、不入库）
+.index/
