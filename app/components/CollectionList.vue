@@ -53,7 +53,11 @@ const displayItems = () =>
       <li v-for="item in displayItems()" :key="item.docId">
         <NuxtLink :to="detailPath(item)" class="cl-item">
           <span class="cl-id">{{ item.docId }}</span>
-          <span class="cl-title">{{ item.title }}</span>
+          <span class="cl-main">
+            <span class="cl-title">{{ item.title }}</span>
+            <span v-if="item.description" class="cl-desc">{{ item.description }}</span>
+          </span>
+          <time v-if="item.created" class="cl-date">{{ item.created }}</time>
           <StatusBadge :collection="collection" :status="item.status" />
         </NuxtLink>
       </li>
@@ -91,12 +95,27 @@ const displayItems = () =>
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 0.5rem 0;
+  padding: 0.5rem 0.5rem 0.5rem 0;
   border-bottom: 1px dashed var(--line);
   text-decoration: none;
   color: inherit;
+  position: relative;
 }
-.cl-item:hover { background: var(--surface-2); }
+/* hover 指示条：左侧出现主色竖条 + 标题变色，替代整行浅灰 */
+.cl-item::before {
+  content: '';
+  position: absolute;
+  left: -0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 0;
+  background: var(--accent);
+  border-radius: 2px;
+  transition: height 0.15s ease;
+}
+.cl-item:hover::before { height: 60%; }
+.cl-item:hover .cl-title { color: var(--accent-2); }
 .cl-id {
   font-family: var(--font-mono);
   font-size: 0.8125rem;
@@ -104,10 +123,29 @@ const displayItems = () =>
   flex-shrink: 0;
   min-width: 4rem;
 }
-.cl-title {
+.cl-main {
   flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+.cl-title {
   font-size: 0.9375rem;
   color: var(--ink);
+}
+.cl-desc {
+  font-size: 0.8125rem;
+  color: var(--ink-3);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cl-date {
+  font-size: 0.75rem;
+  color: var(--ink-3);
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
 }
 .cl-empty {
   color: var(--ink-3);
