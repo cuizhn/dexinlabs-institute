@@ -151,6 +151,20 @@ for (const [id, doc] of docs) {
     }
   }
 
+  // E8：confirmed 结论缺 Owner 裁定记录标记
+  // scope 已由 schema 必填覆盖（findings.scope: z.string().min(1)），E8 只查裁定记录
+  if (type === 'findings' && data.status === 'confirmed') {
+    const body = doc.content
+    // 正文须含「状态与修订记录」节，且节内出现 Owner 升格裁定的关键词
+    const hasStatusSection = /^#{1,4}\s+状态与修订记录\s*$/m.test(body)
+    const hasOwnerRuling = /(Owner|裁定|升格|确认通过|正式确认|R\d+)/.test(body)
+    if (!hasStatusSection) {
+      err(`E8 ${rel} status=confirmed 但正文缺「状态与修订记录」节（ADR-004 §3.3：confirmed 须留裁定出处）`)
+    } else if (!hasOwnerRuling) {
+      err(`E8 ${rel} status=confirmed 但「状态与修订记录」内未出现 Owner 裁定/升格关键词（ADR-004 §3.3：confirmed 不得由 AI 自动赋值）`)
+    }
+  }
+
   // E2 + E5（引用类型错误） + E10/W2（警告级）
   const refs = []
   if (type === 'research') refs.push(['findings', data.findings, 'findings', 'F'])
@@ -166,8 +180,18 @@ for (const [id, doc] of docs) {
     for (const target of arr ?? []) {
       const tgtStr = String(target).trim()
 
-      // 证据锚点 R-0001#ev-01 的锚点部分暂不校验（E6 待实现，属构建脚本）
-      const base = tgtStr.split('#')[0]
+      // 证据锚点：R-0001#ev-01 → 检查宿主 research 文件内 ev-01 锚点存在（E6）
+      const hashIdx = tgtStr.indexOf('#')
+      const base = hashIdx >= 0 ? tgtStr.slice(0, hashIdx) : tgtStr
+      const anchor = hashIdx >= 0 ? tgtStr.slice(hashIdx + 1) : null
+      if (anchor && /^ev-\d+$/.test(anchor)) {
+        const host = docs.get(base)
+        if (host && host.type === 'research') {
+          // 宿主正文必须出现该锚点号（允许作标题、加粗标注或内联标注）
+          const anchored = new RegExp(`(^|[^\\w-])${anchor.replace(/[-]/g, '[-]')}([^\\w-]|$)`, 'm').test(host.content)
+          if (!anchored) err(`E6 ${rel} 的 ${field} 引用 ${tgtStr}，但 ${base} 正文中不存在锚点 ${anchor}（R4：锚点被物理删除属构建错误）`)
+        }
+      }
 
       // E2 悬空引用
       if (!docs.has(base)) {

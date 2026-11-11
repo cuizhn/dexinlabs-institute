@@ -10,7 +10,9 @@ import { z } from 'zod'
 const ID = {
   research: /^R-\d{4}$/,
   findings: /^F-\d{4}$/,
-  instructional: /^C-\d{4}$/
+  instructional: /^C-\d{4}$/,
+  // 可带证据锚点的 research 引用：R-0001 或 R-0001#ev-01（E6 校验锚点存在性）
+  researchWithAnchor: /^R-\d{4}(#ev-\d+)?$/
 }
 
 const common = {
@@ -36,7 +38,7 @@ export const schemas = {
     ...common,
     docId: z.string().regex(ID.findings),
     status: z.enum(['pending-validation', 'provisional', 'confirmed', 'superseded', 'retracted']),
-    sources: z.array(z.string().regex(ID.research)).min(1),
+    sources: z.array(z.string().regex(ID.researchWithAnchor)).min(1),
     evidence: z.array(z.string()).default([]),
     scope: z.string().min(1),
     instructional: z.array(z.string().regex(ID.instructional)).default([]),
