@@ -28,22 +28,21 @@
 
 ### ① `pnpm install` 一次成功，无 node-gyp 编译失败
 
-**结论：通过（有 caveat）**
+**结论：通过**
 
-- ✅ `better-sqlite3@13.0.3` 在 Windows 上原生编译成功（pnpm rebuild 通过），无 node-gyp 报错。
+- ✅ `better-sqlite3@13.0.3` 在 Windows 上原生编译成功（pnpm rebuild 通过），无 node-gyp 报错，也无需 VS Build Tools。
 - ✅ `esbuild@0.28.2` 同样原生编译成功（同一 rebuild 触发）。
-- ⚠️ **pnpm 11 默认安全策略忽略所有 build scripts**，导致外层 `pnpm install` / `pnpm build` 在 postinstall hook 里报 exit 1——这不是依赖本身失败，是 pnpm 安全策略没配置批准列表。
-- 已在 `.npmrc` 加 `enable-pre-post-scripts=true`（最小调整），后续改为 `pnpm.onlyBuiltDependencies` 数组（更规范）。
-- **影响范围**：`pnpm dev` / `pnpm build` 命令目前被这个策略卡住，需用 `.\node_modules\.bin\nuxt.cmd dev` / `.\node_modules\.bin\nuxt.cmd build` 绕过。
+- pnpm 11 默认不执行依赖的 build scripts，需在 `pnpm-workspace.yaml` 的 `allowBuilds` 显式批准（已配置）。
+- **2026-11-11 复测**：`pnpm install` exit 0、`pendingBuilds: []`；`pnpm run build` / `pnpm run dev` 均 exit 0，**不需要绕过 pnpm wrapper**。
 
 ### ② `pnpm dev` 首页 HTTP 200，无 SSR 报错
 
 **结论：通过**
 
-- 直接用 Windows wrapper `.\node_modules\.bin\nuxt.cmd dev --port 3001` 启动：
+- `pnpm run dev --port 3001`（2026-11-11 复测）：
   - Nuxt 4.6.4 with Nitro 2.13.6, Vite 8.3.7, Vue 3.5.45
   - Content v3：**Processed 4 collections and 3 files in 286.55ms**
-  - Ready in 6.45s → `http://127.0.0.1:3001/`
+  - Ready in 6.21s → `http://localhost:3001/`
 - Nitro preview（`node .output/server/index.mjs`）curl 验证：
   - HTTP 200
   - 页面标题 "得心研究院"、三集合 `<section id="research">/id="findings">/id="instructional">` 全部渲染
@@ -61,7 +60,7 @@
 
 **结论：通过**
 
-- `.\node_modules\.bin\nuxt.cmd build`（绕过 pnpm wrapper 的 postinstall 检查）：
+- `pnpm run build`（**2026-11-11 复测通过**，无需绕过 pnpm wrapper）：
   - Build complete in 12.7s
   - Total size: **23.4 MB**（10.4 MB gzip）
   - `.output/server/index.mjs` 完整产出
@@ -81,19 +80,39 @@
 | 问题 | 原因 | 修复 |
 | --- | --- | --- |
 | Content v3 启动报错 "requires better-sqlite3" | `@nuxt/content@3.16.2` 不再把 better-sqlite3 列为 peerDependency，要求手动安装 | `pnpm add better-sqlite3@13.0.3` |
-| pnpm 11 忽略原生 build scripts（better-sqlite3 + esbuild） | pnpm 11 默认安全策略 | `.npmrc enable-pre-post-scripts=true`（待规范化为 `pnpm.onlyBuiltDependencies`） |
+| pnpm 11 忽略原生 build scripts（better-sqlite3 + esbuild） | pnpm 11 默认安全策略 | `pnpm-workspace.yaml` 的 `allowBuilds: {better-sqlite3: true, esbuild: true}`（pnpm 11 官方键名，已从 pnpm.mjs 提示文案核对）；`.npmrc` 已删除（`enable-pre-post-scripts` 与本问题无关） |
 | Bash 脚本 node_modules/.bin/nuxt 不能被 Node 直接执行 | pnpm 生成跨平台 wrapper：`.cmd`（Windows）+ 无扩展名（bash） | 改用 `.\node_modules\.bin\nuxt.cmd dev/build` 或 `pnpm exec nuxt dev/build` |
 | localhost:3000 命中主仓 dexinlabs 的 dev 服务 | 端口冲突 | 新项目用 3001（dev）+ 3000（preview，避开主仓） |
 
 ---
 
-## 四、P1 后续待完成（不阻塞 P2）
+## 四、修复清单执行结果（2026-11-11 复测）
 
-1. **`.npmrc` 规范化**：把 `enable-pre-post-scripts=true` 改为 `pnpm.onlyBuiltDependencies: ['better-sqlite3', 'esbuild']`，更符合 pnpm 11 安全策略设计意图。
-2. **`package.json` scripts 修复**：`dev` / `build` / `generate` / `preview` 当前被 pnpm postinstall 绊住，需用 `pnpm exec` 或直接改调 `nuxt.cmd`。
-3. **字体自托管落地**：字体文件由 Owner 提供后放入 `public/fonts/`，启用 main.css 中的 @font-face。
-4. **`content.config.ts` 增加 `surround`**：让页面路由用 ID（`/findings/F-0001`）而非 slug，对齐 ADR-004 §3.1 URL 混合制。
+| # | 原清单项 | 执行结果 |
+| --- | --- | --- |
+| 1 | `.npmrc` 规范化为 `onlyBuiltDependencies` | **已完成（结论修正）**：`.npmrc` 已删除；批准列表实际落在 `pnpm-workspace.yaml` 的 **`allowBuilds`**（pnpm 11 正确键名，`onlyBuiltDependencies` 在本版 dist 中已无匹配）。删除后 `pnpm install` exit 0，`pendingBuilds: []` |
+| 2 | `package.json` scripts 修复 | **无需修复（原判断有误）**：`pnpm install` / `pnpm run build` / `pnpm run dev` 三者复测均 exit 0；`pnpm run dev` Ready 6.21s、首页 HTTP 200、三集合 section 全部渲染。此前失败是首次安装阶段的一次性现象，不是脚本本身问题，故 scripts 保持原样 |
+| 3 | 字体自托管落地 | **未执行（缺资产）**：仓内无字体文件，`public/fonts/` 与 `@font-face` 注释保持占位；不伪造字体文件。待 Owner 提供后启用 |
+| 4 | `content.config.ts` 增加 `surround` | **原方案有误，已改判**：`surround` 是「上一篇/下一篇」导航，与 URL 形态无关。ID 路由由文件命名 + 详情页显式路由决定，属 P4 范围（详见 §五） |
 
 ---
 
-**V-0 报告结束。P1 骨架门禁通过（V-0 通过），P2 内容模型落地已就绪。**
+## 五、新发现：Content v3 与 ADR-004 的两处落地冲突（P2/P4 前置）
+
+用 `.data/content/contents.sqlite` 实查三集合记录，确认两处与架构规范的偏差：
+
+| # | 现象 | 实查证据 | 影响的规范 | 性质 |
+| --- | --- | --- | --- | --- |
+| F-1 | **frontmatter `id` 被 Content 保留字段覆盖**，schema 的正则实际上没校验到作者写的 ID | `_content_findings.id = "findings/findings/F-0001.md"`（文件路径型），而作者写的是 `F-0001`；`z.object({ id: /^F-\d{4}$/ })` 未报错 | ADR-004 §3.1 ID 形态、ADR-005 §3.3 E9 单文件校验 | **实现层冲突**，需在 P2 定字段名 |
+| F-2 | **path 被强制小写** | `path = "/findings/f-0001"`，非 ADR 要求的 `/findings/F-0001` | ADR-004 §3.1 URL 混合制（结论详情用 ID） | **实现层冲突**，需在 P4 用显式 `[id].vue` 路由 + 自建映射解决 |
+
+**待 Owner 一句话确认的选项（F-1，不自行裁定）**：
+
+- **A（建议）**：frontmatter 字段改名为 `docId`，schema 校验 `docId` 正则；展示与引用仍用 `F-0001`。代价：ADR-004 要补一句「frontmatter 字段名为 `docId`，`id` 为 Content 保留字段」。
+- **B**：保留 `id` 字段名，E9 改为校验 `stem`（`findings/F-0001`）而非 frontmatter `id`。代价：E9 依赖平台派生字段，schema 表达力弱。
+
+**F-2 处理**：Content 的 `path` 无法保留大写，但 P4 会用 `pages/findings/[id].vue` 显式匹配 `F-0001` 并 query 查询，规范要求的对外 URL 仍可实现；届时以路由测试为准，不依赖 `path` 字段。
+
+---
+
+**V-0 报告结束。P1 骨架门禁通过（V-0 通过）。P2 开工前置：F-1 字段名需 Owner 确认；F-2 属 P4 路由实现。**
