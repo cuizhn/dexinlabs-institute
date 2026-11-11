@@ -10,7 +10,18 @@ export default defineNuxtConfig({
 
   modules: ['@nuxt/content'],
 
-  css: ['~/assets/css/main.css'],
+  // 公式渲染已落地（V-6 已验证 Content v3 兼容）
+  // Content v3 的插件配置在 content.build.markdown，且为 name → options 映射
+  content: {
+    build: {
+      markdown: {
+        remarkPlugins: { 'remark-math': {} },
+        rehypePlugins: { 'rehype-katex': {} }
+      }
+    }
+  },
+
+  css: ['~/assets/css/main.css', 'katex/dist/katex.min.css'],
 
   // 字体自托管（ADR-006 §3.4，禁 Google Fonts）；字体文件由 Owner 提供后放入 public/fonts/
   app: {
