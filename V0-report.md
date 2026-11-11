@@ -19,7 +19,7 @@
 | vite | **8.3.7** | （随 Nuxt） | — |
 | vue | **3.5.45** | — | — |
 | typescript | **6.0.3** | （Q4 候选起点） | — |
-| better-sqlite3 | **13.0.3** | Content v3 硬依赖 | **V-0 关键**：Windows 原生编译成功 |
+| better-sqlite3 | **13.0.3** | Content v3 硬依赖 | **V-0 流程**：使用自带 `prebuilds/win32-x64.node`，**不编译**（P7 I8 修正，见 §三） |
 | esbuild | **0.28.2** | Vite 硬依赖 | pnpm 11 安全策略默认忽略，需手动批准 |
 
 ---
@@ -30,9 +30,11 @@
 
 **结论：通过**
 
-- ✅ `better-sqlite3@13.0.3` 在 Windows 上原生编译成功（pnpm rebuild 通过），无 node-gyp 报错，也无需 VS Build Tools。
-- ✅ `esbuild@0.28.2` 同样原生编译成功（同一 rebuild 触发）。
-- pnpm 11 默认不执行依赖的 build scripts，需在 `pnpm-workspace.yaml` 的 `allowBuilds` 显式批准（已配置）。
+- ✅ `better-sqlite3@13.0.3` **不需要编译**：包内自带 `prebuilds/win32-x64.node`，安装后直接加载。
+  > **2026-11-11 P7 修正**：本节初版写作「原生编译成功」属误读——实测该包目录下无 `build/`，本机也没有 Python（node-gyp 必备前置）。真正结论是「用预编译产物，全程不触发 node-gyp」。
+- ✅ `esbuild@0.28.2` 需运行安装脚本取本地二进制，已批准。
+- pnpm 11 默认不执行依赖的 build scripts，需在 `pnpm-workspace.yaml` 的 `allowBuilds` 显式声明。
+  > **2026-11-11 P7 修正**：`better-sqlite3` 必须显式写 `false`（禁止安装脚本）。若写 `true`，pnpm 会执行 `node-gyp rebuild`；因本机无 Python，**干净 clone 安装直接失败**（P7 I8 实测）。
 - **2026-11-11 复测**：`pnpm install` exit 0、`pendingBuilds: []`；`pnpm run build` / `pnpm run dev` 均 exit 0，**不需要绕过 pnpm wrapper**。
 
 ### ② `pnpm dev` 首页 HTTP 200，无 SSR 报错
@@ -83,7 +85,7 @@
 | 问题 | 原因 | 修复 |
 | --- | --- | --- |
 | Content v3 启动报错 "requires better-sqlite3" | `@nuxt/content@3.16.2` 不再把 better-sqlite3 列为 peerDependency，要求手动安装 | `pnpm add better-sqlite3@13.0.3` |
-| pnpm 11 忽略原生 build scripts（better-sqlite3 + esbuild） | pnpm 11 默认安全策略 | `pnpm-workspace.yaml` 的 `allowBuilds: {better-sqlite3: true, esbuild: true}`（pnpm 11 官方键名，已从 pnpm.mjs 提示文案核对）；`.npmrc` 已删除（`enable-pre-post-scripts` 与本问题无关） |
+| pnpm 11 忽略原生 build scripts（better-sqlite3 + esbuild） | pnpm 11 默认安全策略 | `pnpm-workspace.yaml` 的 `allowBuilds: {better-sqlite3: **false**, esbuild: true}`（pnpm 11 官方键名，已从 pnpm.mjs 提示文案核对）；**better-sqlite3 必须为 false**（P7 I8 修正，原写 true 会导致无 Python 环境安装失败）；`.npmrc` 已删除（`enable-pre-post-scripts` 与本问题无关） |
 | Bash 脚本 node_modules/.bin/nuxt 不能被 Node 直接执行 | pnpm 生成跨平台 wrapper：`.cmd`（Windows）+ 无扩展名（bash） | 改用 `.\node_modules\.bin\nuxt.cmd dev/build` 或 `pnpm exec nuxt dev/build` |
 | localhost:3000 命中主仓 dexinlabs 的 dev 服务 | 端口冲突 | 新项目用 3001（dev）+ 3000（preview，避开主仓） |
 
