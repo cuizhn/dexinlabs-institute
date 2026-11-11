@@ -1,6 +1,7 @@
 # pnpm 11 build script 批准列表（最小必要调整，原因见 V0-report.md §三）
-# better-sqlite3: @nuxt/content@3.16.2 在 Windows 上的硬依赖，原生编译成功（node-gyp 通过）
-# esbuild: Vite 硬依赖，原生编译成功
+# esbuild: Vite 硬依赖，需运行安装脚本取本地二进制
+# better-sqlite3: 不列入 allowBuilds —— 该包 gypfile=false 且自带 prebuilds/win32-x64.node，
+#   直接使用预编译产物即可；列入 allowBuilds 反而触发 node-gyp rebuild，
+#   在无 Python / 无 VS Build Tools 的机器上会导致干净 clone 安装失败（P7 I8 实测）
 allowBuilds:
-  better-sqlite3: true
   esbuild: true
