@@ -1,9 +1,69 @@
 /* 字体自托管（ADR-006 §3.4：字体自托管，禁 Google Fonts）
-   字体文件未随仓提供：Owner 提供后放入 public/fonts/，再启用下方 @font-face。
-   当前使用系统字体回退，构建不受影响。 */
+   字体文件来自主仓 dexinlabs/public/fonts（已子集化，2026-11-11 复制）。
+   宋体/黑体各 400/500/600/700 四档，浏览器只下载页面实际用到的字重。
+   子集覆盖清单见 public/fonts 下各族的 coverage.txt，许可见同目录 LICENSE.txt。
+   子集外的生僻字静默回退系统字体（Songti SC / PingFang SC 等）。 */
+@font-face {
+  font-family: 'Noto Serif SC';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/noto-serif-sc/NotoSerifSC-400-subset.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Noto Serif SC';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('/fonts/noto-serif-sc/NotoSerifSC-500-subset.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Noto Serif SC';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('/fonts/noto-serif-sc/NotoSerifSC-600-subset.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Noto Serif SC';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/noto-serif-sc/NotoSerifSC-700-subset.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Noto Sans SC';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/noto-sans-sc/NotoSansSC-400-subset.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Noto Sans SC';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('/fonts/noto-sans-sc/NotoSansSC-500-subset.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Noto Sans SC';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('/fonts/noto-sans-sc/NotoSansSC-600-subset.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Noto Sans SC';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/noto-sans-sc/NotoSansSC-700-subset.woff2') format('woff2');
+}
+
 :root {
-  --font-serif: 'Source Han Serif SC', 'Noto Serif SC', 'Songti SC', 'SimSun', serif;
-  --font-sans: 'Source Han Sans SC', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  --font-serif: 'Noto Serif SC', 'Songti SC', 'SimSun', serif;
+  --font-sans: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
   --font-mono: ui-monospace, 'JetBrains Mono', Consolas, monospace;
 
   /* 设计令牌（2026-11-11 页面美化第一档）
@@ -157,15 +217,6 @@ pre {
 .prose .katex {
   font-size: 1.05em;
 }
-
-/* 待字体文件到位后启用：
-@font-face {
-  font-family: 'Source Han Serif SC';
-  src: url('/fonts/SourceHanSerifSC-Regular.woff2') format('woff2');
-  font-weight: 400;
-  font-display: swap;
-}
-*/
 
 /* ============ 深色模式（第四档，令牌化后只需覆盖变量，不动组件） ============ */
 /* 跟随系统：prefers-color-scheme: dark；无需用户手动切换 */
