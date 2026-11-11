@@ -1,5 +1,5 @@
 <template>
   <NuxtLayout>
-    <NuxtPage />
+    <NuxtPage transition="page-fade" />
   </NuxtLayout>
 </template>

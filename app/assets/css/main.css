@@ -166,3 +166,81 @@ pre {
   font-display: swap;
 }
 */
+
+/* ============ 深色模式（第四档，令牌化后只需覆盖变量，不动组件） ============ */
+/* 跟随系统：prefers-color-scheme: dark；无需用户手动切换 */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #141312;
+    --surface: #1c1b19;
+    --surface-2: #2a2824;
+    --ink: #e8e5de;
+    --ink-2: #b5b0a6;
+    --ink-3: #7a7569;
+    --line: #3a3732;
+    --accent: #4a7ec7;
+    --accent-2: #6b9fdc;
+  }
+  /* KaTeX 是 svg，深色下需要反转色相滤镜 */
+  .prose .katex {
+    filter: invert(0.88) hue-rotate(180deg);
+  }
+  ::selection {
+    background: rgba(74, 126, 199, 0.3);
+  }
+}
+
+/* ============ 打印样式（第三档） ============ */
+/* 学术内容常被打印或存 PDF；隐藏导航/页脚/关联面板/搜索，保留正文排版 */
+@media print {
+  html {
+    background: #fff;
+    color: #000;
+  }
+  .site-header,
+  .site-footer,
+  .related-panels,
+  .search-bar,
+  .filters,
+  .hero-search,
+  .hero-stats {
+    display: none !important;
+  }
+  .site-main {
+    padding: 0 !important;
+  }
+  .layout {
+    max-width: none;
+    padding: 0;
+  }
+  .detail {
+    grid-template-columns: 1fr !important;
+  }
+  .detail-body {
+    grid-column: 1 / -1 !important;
+  }
+  .prose a {
+    border-bottom: none;
+    text-decoration: underline;
+    color: #000;
+  }
+  .prose h2 {
+    border-bottom-color: #bbb;
+    page-break-after: avoid;
+  }
+  .prose p,
+  .prose blockquote,
+  .prose li {
+    page-break-inside: avoid;
+  }
+}
+
+/* ============ 页面进入过渡（第四档，克制不抢眼） ============ */
+.page-fade-enter-active,
+.page-fade-leave-active {
+  transition: opacity 0.18s ease;
+}
+.page-fade-enter-from,
+.page-fade-leave-to {
+  opacity: 0;
+}
