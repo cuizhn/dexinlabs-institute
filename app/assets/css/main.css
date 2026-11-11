@@ -1,0 +1,33 @@
+/* 字体自托管（ADR-006 §3.4：字体自托管，禁 Google Fonts）
+   字体文件未随仓提供：Owner 提供后放入 public/fonts/，再启用下方 @font-face。
+   当前使用系统字体回退，构建不受影响。 */
+:root {
+  --font-serif: 'Source Han Serif SC', 'Noto Serif SC', 'Songti SC', 'SimSun', serif;
+  --font-sans: 'Source Han Sans SC', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  --font-mono: ui-monospace, 'JetBrains Mono', Consolas, monospace;
+}
+
+html {
+  font-family: var(--font-serif);
+  line-height: 1.75;
+  color: #111;
+  background: #fff;
+}
+
+body {
+  margin: 0;
+}
+
+code,
+pre {
+  font-family: var(--font-mono);
+}
+
+/* 待字体文件到位后启用：
+@font-face {
+  font-family: 'Source Han Serif SC';
+  src: url('/fonts/SourceHanSerifSC-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-display: swap;
+}
+*/

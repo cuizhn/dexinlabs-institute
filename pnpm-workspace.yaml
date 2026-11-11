@@ -1,0 +1,6 @@
+# pnpm 11 build script 批准列表（最小必要调整，原因见 V0-report.md §三）
+# better-sqlite3: @nuxt/content@3.16.2 在 Windows 上的硬依赖，原生编译成功（node-gyp 通过）
+# esbuild: Vite 硬依赖，原生编译成功
+allowBuilds:
+  better-sqlite3: true
+  esbuild: true
