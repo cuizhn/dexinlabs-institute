@@ -1,0 +1,28 @@
+# ID 注册表（ADR-004 §3.2，Q9 已裁）
+# 规则：
+#   - 新建文档先在此登记，再写内容文件；取号只向未来取号，不回填退役编号。
+#   - 五项检查：ID 唯一 / 已登记 / 类型一致 / 有对应文件 / 退役不复用。
+#   - 本表 Git 跟踪，退役记录永久保留（retired: true），旧 ID 不得回收。
+#   - 内容文件 frontmatter 用 `docId` 字段（F-1a），此处沿用 `id` 表示注册项主键。
+
+entries:
+  - id: R-0001
+    type: research
+    title: 样例研究档案（骨架验证用）
+    created: '2026-11-11'
+    path: content/research/sample-research.md
+    retired: false
+
+  - id: F-0001
+    type: findings
+    title: 样例研究结论（骨架验证用）
+    created: '2026-11-11'
+    path: content/findings/F-0001.md
+    retired: false
+
+  - id: C-0001
+    type: instructional
+    title: 样例教学设计（骨架验证用）
+    created: '2026-11-11'
+    path: content/instructional/sample-instructional.md
+    retired: false

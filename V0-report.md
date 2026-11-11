@@ -68,10 +68,13 @@
 
 ### ⑤ 构建日志无 peer dependency 冲突警告
 
-**结论：通过**
+**结论：通过（附说明）**
 
-- 无 `peer dependency` 字样的 ERROR/WARN。
-- 仅有的 warn：Vite `optimizeDeps.include` 条目解析失败（`@nuxtjs/mdc > remark-gfm` 等），属 Nuxt 模块内部的 Vite 预构建建议，**非 peer 冲突**，不影响运行。
+- 构建期无 peer dependency ERROR。
+- 但 `pnpm peers check` 报 2 项未满足 peer（均来自 Nuxt 4.6.4 → unctx@3.0.1 的依赖树，非本项目直接引入）：
+  - `oxc-parser` 已装 0.139.0，期望 `>=0.140.0`
+  - `unplugin` 已装 2.3.11，期望 `^3.3.0`
+- 影响评估：`pnpm install` / `build` / `dev` 均正常，暂未见运行影响；按 Q4 精确 pin 纪律，**不擅自升级**，仅登记待观察。
 
 ---
 
@@ -101,18 +104,14 @@
 
 用 `.data/content/contents.sqlite` 实查三集合记录，确认两处与架构规范的偏差：
 
-| # | 现象 | 实查证据 | 影响的规范 | 性质 |
+| # | 现象 | 实查证据 | 影响的规范 | 处置 |
 | --- | --- | --- | --- | --- |
-| F-1 | **frontmatter `id` 被 Content 保留字段覆盖**，schema 的正则实际上没校验到作者写的 ID | `_content_findings.id = "findings/findings/F-0001.md"`（文件路径型），而作者写的是 `F-0001`；`z.object({ id: /^F-\d{4}$/ })` 未报错 | ADR-004 §3.1 ID 形态、ADR-005 §3.3 E9 单文件校验 | **实现层冲突**，需在 P2 定字段名 |
-| F-2 | **path 被强制小写** | `path = "/findings/f-0001"`，非 ADR 要求的 `/findings/F-0001` | ADR-004 §3.1 URL 混合制（结论详情用 ID） | **实现层冲突**，需在 P4 用显式 `[id].vue` 路由 + 自建映射解决 |
+| F-1 | **frontmatter `id` 被 Content 保留字段覆盖** | `_content_findings.id = "findings/findings/F-0001.md"`（文件路径型）；schema 正则未生效 | ADR-004 §3.1、ADR-005 §3.3 E9 | **已裁 F-1a（Owner 2026-11-11）：字段改 `docId`**；ADR-003/ADR-004 已回写，代码与样例已改 |
+| F-2 | **path 被强制小写** | `path = "/findings/f-0001"` | ADR-004 §3.1 URL 混合制 | 对外 URL 由 P4 `pages/findings/[id].vue` 显式路由实现，不依赖 `path` |
+| F-3 | **Content 3.16.2 的 `schema` 不做校验** | 坏例 `docId: F-999`、`status: done`、`sources: []`、`scope: ''` 写入后：<br>① `pnpm build` 仍 exit 0；<br>② `.data/content/contents.sqlite` 中原样保留 `status = "done"`，可被 `queryCollection` 读出；<br>③ 在 `@nuxt/content` dist 中搜不到 `safeParse` / `parseAsync` | ADR-008 §3.1.1「Zod 做单文件校验」、R12/E9 | **E9 改由脚本执行**：`content.schema.mjs` 为单一事实源，`scripts/validate-content.mjs` 复用同一 schema；已接入 `dev`/`build` 前置。坏例实测 exit 1（4 条 E9），删后 exit 0 |
 
-**待 Owner 一句话确认的选项（F-1，不自行裁定）**：
-
-- **A（建议）**：frontmatter 字段改名为 `docId`，schema 校验 `docId` 正则；展示与引用仍用 `F-0001`。代价：ADR-004 要补一句「frontmatter 字段名为 `docId`，`id` 为 Content 保留字段」。
-- **B**：保留 `id` 字段名，E9 改为校验 `stem`（`findings/F-0001`）而非 frontmatter `id`。代价：E9 依赖平台派生字段，schema 表达力弱。
-
-**F-2 处理**：Content 的 `path` 无法保留大写，但 P4 会用 `pages/findings/[id].vue` 显式匹配 `F-0001` 并 query 查询，规范要求的对外 URL 仍可实现；届时以路由测试为准，不依赖 `path` 字段。
+**F-3 的规范含义（不改裁定，只补实现口径）**：E9 的「Zod 单文件形状校验」成立，但**执行位置**必须是我们自己的校验脚本，不能寄望 Content 内置校验或构建失败。Zod 若失效，非法状态会被静默存储并在页面上渲染，属高危静默失败。
 
 ---
 
-**V-0 报告结束。P1 骨架门禁通过（V-0 通过）。P2 开工前置：F-1 字段名需 Owner 确认；F-2 属 P4 路由实现。**
+**V-0 报告结束。P1 骨架门禁通过（V-0 通过）。P2 已通过（schema 单一事实源 + registry + 模板 + 样例 + E9 脚本）；P3 部分通过（E9/registry 已实现，E10 与索引未做）。**

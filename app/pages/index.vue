@@ -23,8 +23,8 @@ const groups = [
     <section v-for="group in groups" :id="group.key" :key="group.key" class="group">
       <h2>{{ group.label }}（{{ group.items.length }}）</h2>
       <ul v-if="group.items.length">
-        <li v-for="item in group.items" :key="item.id">
-          <span>{{ item.id }} · {{ item.title }}</span>
+        <li v-for="item in group.items" :key="item.docId">
+          <span>{{ item.docId }} · {{ item.title }}</span>
           <span class="status">{{ item.status }}</span>
         </li>
       </ul>
