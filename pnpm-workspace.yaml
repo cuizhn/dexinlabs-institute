@@ -1,7 +1,8 @@
 # pnpm 11 build script 批准列表（最小必要调整，原因见 V0-report.md §三）
 # esbuild: Vite 硬依赖，需运行安装脚本取本地二进制
-# better-sqlite3: 不列入 allowBuilds —— 该包 gypfile=false 且自带 prebuilds/win32-x64.node，
-#   直接使用预编译产物即可；列入 allowBuilds 反而触发 node-gyp rebuild，
-#   在无 Python / 无 VS Build Tools 的机器上会导致干净 clone 安装失败（P7 I8 实测）
+# better-sqlite3: 显式禁用安装脚本 —— 该包 gypfile=false 且自带 prebuilds/win32-x64.node，
+#   直接使用预编译产物即可；若允许其运行脚本会触发 node-gyp rebuild，
+#   在无 Python / 无 VS Build Tools 的机器上导致干净 clone 安装失败（P7 I8 实测）
 allowBuilds:
+  better-sqlite3: false
   esbuild: true
