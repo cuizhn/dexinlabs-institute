@@ -28,16 +28,19 @@ const byId = new Map() // id → entry
 
 for (const entry of entries) {
   if (!entry?.id) {
-    err('E1 注册表存在缺少 id 的条目')
+    err('E4 注册表存在缺少 id 的条目')
     continue
   }
-  if (byId.has(entry.id)) err(`E1 注册表中 ${entry.id} 重复登记`)
+  if (byId.has(entry.id)) err(`E3 注册表中 ${entry.id} 重复登记`)
   byId.set(entry.id, entry)
-  if (!entry.path || !fs.existsSync(path.join(ROOT, entry.path))) {
-    err(`E4 ${entry.id} 已登记但文件不存在：${entry.path ?? '(缺 path)'}`)
+  // 退役项允许没有文件（ADR-004 §3.2 第 5 项：退役后 ID 永久保留），故豁免「有对应文件」检查
+  if (entry.retired !== true) {
+    if (!entry.path || !fs.existsSync(path.join(ROOT, entry.path))) {
+      err(`E4 ${entry.id} 已登记但文件不存在：${entry.path ?? '(缺 path)'}`)
+    }
   }
   if (!['research', 'findings', 'instructional'].includes(entry.type)) {
-    err(`E3 ${entry.id} 的 type 非法：${entry.type}`)
+    err(`E4 ${entry.id} 的 type 非法：${entry.type}`)
   }
 }
 
@@ -68,18 +71,20 @@ for (const collection of Object.keys(schemas)) {
     const d = parsed.data
     const id = d.docId
 
-    // E5：docId 重复（同一类型或跨类型）
+    // E3：docId 重复（同一类型或跨类型）
     if (seenId.has(id)) {
-      err(`E5 ${id} 在多处出现：${seenId.get(id)} 与 ${rel}`)
+      err(`E3 ${id} 在多处出现：${seenId.get(id)} 与 ${rel}`)
     } else {
       seenId.set(id, rel)
     }
 
-    // E3：注册表类型不符（此处把 registry 叫 E3，A1 schema 正则不重复报）
+    // E4：注册表一致性（未登记 / 退役编号复用 / 类型不符）
     const entry = byId.get(id)
     if (!entry) err(`E4 ${rel} 的 docId ${id} 未在 registry.yaml 登记`)
-    else if (entry.type !== collection) {
-      err(`E3 ${rel} 属于 ${collection}，但注册表登记为 ${entry.type}`)
+    else if (entry.retired === true) {
+      err(`E4 ${rel} 使用了已退役编号 ${id}（ADR-004 §3.2 第 5 项：退役 ID 不得回收复用）`)
+    } else if (entry.type !== collection) {
+      err(`E4 ${rel} 属于 ${collection}，但注册表登记为 ${entry.type}`)
     }
 
     let refs_out = []
